@@ -4,10 +4,12 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from functools import update_wrapper, singledispatchmethod
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
 
 __all__ = [
     'clip_scalar', 'mkColor', 'glColor', 'intColor', 'clip_array',
-    'Filter', 'increment_path', 'now'
+    'Filter', 'increment_path', 'now', 'get_path'
 ]
 
 Colors = {
@@ -242,3 +244,7 @@ class dispatchmethod(singledispatchmethod):
         _method.register = self.register
         update_wrapper(_method, self.func)
         return _method
+
+
+def get_path() -> Path:
+    return BASE_DIR

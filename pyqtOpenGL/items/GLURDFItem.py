@@ -67,6 +67,11 @@ class GLLinkItem(GLGraphicsItem):
     ):
         if axis_visiable is not None:
             self.axis.setVisible(axis_visiable)
+            if axis_visiable and self.visual_model is not None:
+                self.visual_model.setMaterialData(opacity=0.5)
+            elif self.visual_model is not None:
+                self.visual_model.setMaterialData(opacity=1)
+
         if visual_visiable is not None and self.visual_model is not None:
             self.visual_model.setVisible(visual_visiable)
 
@@ -102,7 +107,7 @@ class Joint:
     def value(self):
         return self._value
 
-    def set_value(self, value):
+    def set_value(self, value):  # rad or m
         self._value = np.clip(value, self.limit[0], self.limit[1])
         tf = Matrix4x4()
         # 根据关节类型设置关节值

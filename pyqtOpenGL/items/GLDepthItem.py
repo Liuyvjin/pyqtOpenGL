@@ -73,7 +73,8 @@ uniform mat4 view;
 void main() {
     vec3 frag_pos_wrt_camera = vec3(view * vec4(FragPos, 1.0));
 
-    float distance = abs(frag_pos_wrt_camera.z);
+    //float distance = abs(frag_pos_wrt_camera.z);
+    float distance = length(frag_pos_wrt_camera);
 
     // 0 -> 1.2, 20 -> 0
     FragColor = vec4(vec3(max((20 - distance), 0) / 20 * 1.2), 1);

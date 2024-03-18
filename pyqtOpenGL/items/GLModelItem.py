@@ -53,6 +53,10 @@ class GLModelItem(GLGraphicsItem, LightMixin):
     def getMaterial(self, mesh_id):
         return self.meshes[mesh_id]._material
 
+    def setMaterialData(self, **kwargs):
+        for mesh in self.meshes:
+            mesh._material.set_data(**kwargs)
+
     def setPaintOrder(self, order: list):
         """设置绘制顺序, order为mesh的索引列表"""
         assert max(order) < len(self.meshes) and min(order) >= 0
