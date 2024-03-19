@@ -7,14 +7,16 @@ from ..transform3d import Matrix4x4
 from .GLModelItem import GLModelItem
 from .GLAxisItem import GLAxisItem
 from pathlib import Path
-BASE_DIR = Path(__file__).resolve().parent
+
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
+BASE_DIR = Path(__file__).resolve().parent
+
 __all__ = ['GLURDFItem', 'GLLinkItem', 'Joint']
 
-
 rad2deg = 180 / np.pi
+
 
 def parse_origin(origin: ET.Element):
     rpy_str = origin.get('rpy', '0 0 0').split()
@@ -23,17 +25,18 @@ def parse_origin(origin: ET.Element):
     xyz = [float(val) for val in xyz_str]
     return rpy, xyz
 
+
 class GLLinkItem(GLGraphicsItem):
 
     def __init__(
-        self,
-        name: str = None,
-        mesh_path: Union[str, Path] = None,
-        lights: list = None,
-        origin: Matrix4x4 = None,
-        glOptions: str = "translucent",
-        axis_visiable: bool = False,
-        parentItem: GLGraphicsItem=None,
+            self,
+            name: str = None,
+            mesh_path: Union[str, Path] = None,
+            lights: list = None,
+            origin: Matrix4x4 = None,
+            glOptions: str = "translucent",
+            axis_visiable: bool = False,
+            parentItem: GLGraphicsItem = None,
     ):
         super().__init__(parentItem=parentItem)
         self.name = name
@@ -46,9 +49,9 @@ class GLLinkItem(GLGraphicsItem):
         # visual model: optional
         if mesh_path is not None:
             self.visual_model = GLModelItem(
-                path = mesh_path,
-                lights = lights,
-                glOptions = glOptions,
+                path=mesh_path,
+                lights=lights,
+                glOptions=glOptions,
             )
 
             # visual origin transform, visual model 相对于 连体坐标系 的位姿
@@ -61,9 +64,9 @@ class GLLinkItem(GLGraphicsItem):
         return [item for item in self.childItems() if isinstance(item, GLLinkItem)]
 
     def set_data(
-        self,
-        axis_visiable: bool = None,
-        visual_visiable: bool = None,
+            self,
+            axis_visiable: bool = None,
+            visual_visiable: bool = None,
     ):
         if axis_visiable is not None:
             self.axis.setVisible(axis_visiable)
@@ -89,7 +92,7 @@ class Joint:
     type: str  # revolute, prismatic. fixed
     axis: np.ndarray = None
     limit: np.ndarray = None
-    origin: Matrix4x4 = None # child axis relative to parent axis
+    origin: Matrix4x4 = None  # child axis relative to parent axis
     _value: float = 0
 
     def __post_init__(self):
@@ -113,7 +116,7 @@ class Joint:
         # 根据关节类型设置关节值
         if self.type == 'revolute':
             tf = tf.fromAxisAndAngle(self.axis[0], self.axis[1],
-                                     self.axis[2], rad2deg*value)
+                                     self.axis[2], rad2deg * value)
         elif self.type == 'prismatic':
             t = self.axis * value
             tf = tf.moveto(t[0], t[1], t[2])
@@ -128,13 +131,13 @@ class GLURDFItem(GLGraphicsItem):
     """ Displays a GelSlim model with a surface plot on top of it."""
 
     def __init__(
-        self,
-        urdf_path: Union[str, Path],
-        lights: list,
-        glOptions: str = "translucent",
-        parentItem=None,
-        axis_visiable=False,
-        **kwargs # 传递给 GLLinkItem.set_data
+            self,
+            urdf_path: Union[str, Path],
+            lights: list,
+            glOptions: str = "translucent",
+            parentItem=None,
+            axis_visiable=False,
+            **kwargs  # 传递给 GLLinkItem.set_data
     ):
         super().__init__(parentItem=parentItem)
 
@@ -212,7 +215,7 @@ class GLURDFItem(GLGraphicsItem):
     def get_links_name(self) -> List[str]:
         return list(self._links.keys())
 
-    def set_link(self, name: Union[int, str], **kwargs): # axis_visiable, visual_visiable
+    def set_link(self, name: Union[int, str], **kwargs):  # axis_visiable, visual_visiable
         if isinstance(name, int):
             name = list(self._links.keys())[name]
         self._links[name].set_data(**kwargs)
@@ -235,12 +238,12 @@ class GLURDFItem(GLGraphicsItem):
 
         self._joints[joint_name] = Joint(
             joint_name,
-            parent = self.get_link(parent_link),
-            child = link,
-            type = joint_type,
-            axis = np.array(joint_axis),
-            limit = np.array(joint_limit),
-            origin = origin
+            parent=self.get_link(parent_link),
+            child=link,
+            type=joint_type,
+            axis=np.array(joint_axis),
+            limit=np.array(joint_limit),
+            origin=origin
         )
 
     def print_links(self):
@@ -249,12 +252,12 @@ class GLURDFItem(GLGraphicsItem):
         print(self._urdf_path)
         stack = [(self.base_link, 1)]  # node, 缩进级别
 
-        while(stack):
+        while (stack):
             node, level = stack.pop()
             print(prefix * level + node.name)
 
             for child in reversed(node.childLinks()):
-                    stack.append((child, level+1))
+                stack.append((child, level + 1))
         print()
 
     def print_joints(self):
@@ -280,9 +283,9 @@ class GLURDFItem(GLGraphicsItem):
                 origin_tf = Matrix4x4.fromRpyXyz(*parse_origin(origin))
 
         return GLLinkItem(
-            name = name,
-            mesh_path = mesh_path,
-            lights = self._lights,
-            origin = origin_tf,
-            glOptions = self._glOptions,
+            name=name,
+            mesh_path=mesh_path,
+            lights=self._lights,
+            origin=origin_tf,
+            glOptions=self._glOptions,
         )

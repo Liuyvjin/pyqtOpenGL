@@ -6,7 +6,7 @@ from ..transform3d import Matrix4x4, Vector3
 from .MeshData import vertex_normal, Mesh
 from .light import LightMixin, light_fragment_shader
 
-__all__ = ['GLMeshItem']
+__all__ = ['GLMeshItem', 'mesh_vertex_shader']
 
 
 class GLMeshItem(GLGraphicsItem, LightMixin):
@@ -35,7 +35,7 @@ class GLMeshItem(GLGraphicsItem, LightMixin):
         self.addLight(lights)
 
     def initializeGL(self):
-        self.shader = Shader(vertex_shader, light_fragment_shader)
+        self.shader = Shader(mesh_vertex_shader, light_fragment_shader)
         self._mesh.initializeGL()
 
     def paint(self, model_matrix=Matrix4x4()):
@@ -57,7 +57,7 @@ class GLMeshItem(GLGraphicsItem, LightMixin):
     def getMaterial(self):
         return self._mesh.getMaterial()
 
-vertex_shader = """
+mesh_vertex_shader = """
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
