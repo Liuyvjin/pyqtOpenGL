@@ -27,7 +27,7 @@ class GLView(GLViewWidget):
         self.addItem(GLDepthItem(vertexes=ver3, indices=ind3).translate(-3,-1,0))
 
         # model
-        model = GLDepthItem(path="./pyqtOpenGL/items/resources/objects/cyborg/cyborg.obj")
+        model = GLDepthItem(path="../pyqtOpenGL/items/resources/objects/cyborg/cyborg.obj")
         model.applyTransform(Matrix4x4.fromEulerAngles(0, 90, 90)).translate(0,2.5,0.5)
         self.addItem(model)
 

@@ -5,7 +5,7 @@ from .shader import Shader
 from .MeshData import vertex_normal, Mesh
 from ..transform3d import Matrix4x4, Vector3
 from ..GLGraphicsItem import GLGraphicsItem
-from .GLMeshItem import vertex_shader
+from .GLMeshItem import mesh_vertex_shader
 
 __all__ = ['GLDepthItem']
 
@@ -38,7 +38,7 @@ class GLDepthItem(GLGraphicsItem):
         self._order = list(range(len(self.meshes)))
 
     def initializeGL(self):
-        self.shader = Shader(vertex_shader, fragment_shader)
+        self.shader = Shader(mesh_vertex_shader, fragment_shader)
 
         for m in self.meshes:
             m.initializeGL()

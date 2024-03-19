@@ -2,22 +2,23 @@ from math import radians, tan
 from enum import Enum, auto
 from .transform3d import Matrix4x4, Quaternion, Vector3
 
+
 class Camera:
 
     def __init__(
-        self,
-        position = Vector3(0., 0., 5),
-        yaw = 0,
-        pitch = 0,
-        roll = 0,
-        fov = 45,
+            self,
+            position=Vector3(0., 0., 5),
+            yaw=0,
+            pitch=0,
+            roll=0,
+            fov=45,
     ):
         """View Corrdinate System
         default front vector: (0, 0, -1)
         default up Vector: (0, 1, 0)
-        yaw: rotate around VCS y axis
-        pitch: rotate around VCS x axis
-        roll: rotate around VCS z axis
+        yaw: rotate around VCS y-axis
+        pitch: rotate around VCS x-axis
+        roll: rotate around VCS z-axis
         """
         self.pos = Vector3(position)  # 世界坐标系原点指向相机位置的向量, 在相机坐标下的坐标
         self.quat = Quaternion.fromEulerAngles(pitch, yaw, roll)
@@ -26,7 +27,7 @@ class Camera:
     def get_view_matrix(self):
         return Matrix4x4.fromTranslation(-self.pos.x, -self.pos.y, -self.pos.z) * self.quat
 
-    def set_view_matrix(self, view_matrix:Matrix4x4):
+    def set_view_matrix(self, view_matrix: Matrix4x4):
         self.quat = view_matrix.toQuaternion()
         self.pos = -view_matrix.toTranslation()
 
@@ -61,7 +62,7 @@ class Camera:
     def orbit(self, yaw, pitch, roll=0, base=None):
         """Orbits the camera around the center position.
         *yaw* and *pitch* are given in degrees."""
-        q =  Quaternion.fromEulerAngles(pitch, yaw, roll)
+        q = Quaternion.fromEulerAngles(pitch, yaw, roll)
 
         if base is None:
             base = self.quat
@@ -75,7 +76,7 @@ class Camera:
 
         scale = self.pos.z * 2. * tan(0.5 * radians(self.fov)) / width
 
-        self.pos = base + Vector3([-dx*scale, -dy*scale, dz*scale])
+        self.pos = base + Vector3([-dx * scale, -dy * scale, dz * scale])
         if self.pos.z < 0.1:
             self.pos.z = 0.1
 

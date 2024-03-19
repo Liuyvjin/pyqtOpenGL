@@ -223,6 +223,18 @@ def now(fmt='%y_%m_%d_%H_%M_%S'):
     return datetime.now().strftime(fmt)
 
 
+def _singletons(cls):
+    """单例装饰器"""
+    _instances = {}
+
+    def _singleton(*args, **kwargs):
+        if cls not in _instances:
+            _instances[cls] = cls(*args, **kwargs)
+        return _instances[cls]
+
+    return _singleton
+
+
 class dispatchmethod(singledispatchmethod):
     """Dispatch a method to different implementations
     depending upon the type of its first argument.
@@ -244,7 +256,3 @@ class dispatchmethod(singledispatchmethod):
         _method.register = self.register
         update_wrapper(_method, self.func)
         return _method
-
-
-def get_path() -> Path:
-    return BASE_DIR

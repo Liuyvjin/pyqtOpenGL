@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import OpenGL.GL as gl
 from pathlib import Path
+
 BASE_DIR = Path(__file__).resolve().parent
 
 __all__ = ['GLTextItem']
@@ -17,17 +18,19 @@ class GLTextItem(GLGraphicsItem):
     """Draws points at a list of 3D positions."""
 
     def __init__(
-        self,
-        text: str=None,
-        pos = [0, 0, -10],
-        font = None,  # "times.ttf", "msyh.ttc", "Deng.ttf"
-        color = (255, 255, 255, 255),
-        fontsize = 40,
-        fixed = True,  # 是否固定在视图上, if True, pos is in viewport, else in world
-        glOptions = 'ontop',
-        parentItem = None
+            self,
+            text: str = None,
+            pos=None,
+            font=None,  # "times.ttf", "msyh.ttc", "Deng.ttf"
+            color=(255, 255, 255, 255),
+            fontsize=40,
+            fixed=True,  # 是否固定在视图上, if True, pos is in viewport, else in world
+            glOptions='ontop',
+            parentItem=None
     ):
         super().__init__(parentItem=parentItem)
+        if pos is None:
+            pos = [0, 0, -10]
         self.setGLOptions(glOptions)
         self.setDepthValue(100)
         self._fixed = fixed
@@ -36,14 +39,14 @@ class GLTextItem(GLGraphicsItem):
         self._pixel_wh = [0, 0]
         self._text_w = 0
         self._text_h = 0
-        self.vertices = np.array( [
+        self.vertices = np.array([
             # 顶点坐标             # texcoord
-            -1, -1, 0,   0.0, 0.0,
-             1, -1, 0,   1.0, 0.0,
-             1,  1, 0,   1.0, 1.0,
-             1,  1, 0,   1.0, 1.0,
-            -1,  1, 0,   0.0, 1.0,
-            -1, -1, 0,   0.0, 0.0,
+            -1, -1, 0, 0.0, 0.0,
+            1, -1, 0, 1.0, 0.0,
+            1, 1, 0, 1.0, 1.0,
+            1, 1, 0, 1.0, 1.0,
+            -1, 1, 0, 0.0, 1.0,
+            -1, -1, 0, 0.0, 0.0,
         ], dtype=np.float32).reshape(-1, 5)
 
         self.setData(text, font, color, fontsize, pos)
@@ -52,7 +55,7 @@ class GLTextItem(GLGraphicsItem):
         self.shader = Shader(vertex_shader, fragment_shader)
         self.vao = VAO()
         self.vbo = VBO([self.vertices], [[3, 2]], usage=gl.GL_STATIC_DRAW)
-        self.vbo.setAttrPointer([0], attr_id=[[0,1]])
+        self.vbo.setAttrPointer([0], attr_id=[[0, 1]])
         self.tex = Texture2D(None, flip_y=True, wrap_s=gl.GL_CLAMP_TO_EDGE, wrap_t=gl.GL_CLAMP_TO_EDGE)
 
     def updateGL(self):
@@ -71,7 +74,7 @@ class GLTextItem(GLGraphicsItem):
             self.vbo.updateData([0], [self.vertices])
             self._wh_update_flag = False
 
-    def setData(self, text: str=None, font=None, color=None, fontsize=None, pos=None):
+    def setData(self, text: str = None, font=None, color=None, fontsize=None, pos=None):
         if text is not None:
             self._text = text
             self._tex_update_flag = True
@@ -96,7 +99,7 @@ class GLTextItem(GLGraphicsItem):
             self._tex_update_flag = True
 
         if self._tex_update_flag:
-            font = ImageFont.truetype(self._font, self._fontsize, encoding="unic") # Deng.ttf, msyh.ttc
+            font = ImageFont.truetype(self._font, self._fontsize, encoding="unic")  # Deng.ttf, msyh.ttc
             self._pixel_wh = np.array(font.getbbox(text)[2:])
             image = Image.new("RGBA", tuple(self._pixel_wh), (0, 0, 0, 0))  # 背景透明
             draw = ImageDraw.Draw(image)

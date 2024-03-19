@@ -9,7 +9,7 @@ from ..GLGraphicsItem import GLGraphicsItem
 from .MeshData import sphere
 
 
-__all__ = ["PointLight", "LightMixin"]
+__all__ = ["PointLight", "LightMixin", "light_fragment_shader"]
 
 class PointLight(GLGraphicsItem):
 
