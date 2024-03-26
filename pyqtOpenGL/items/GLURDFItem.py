@@ -90,7 +90,7 @@ class Joint:
     axis: np.ndarray = None
     limit: np.ndarray = None
     origin: Matrix4x4 = None # child axis relative to parent axis
-    _value: float = 0
+    _value: float = 0  # rad or m
 
     def __post_init__(self):
         assert self.type in ['revolute', 'prismatic', 'fixed'], \
@@ -113,7 +113,7 @@ class Joint:
         # 根据关节类型设置关节值
         if self.type == 'revolute':
             tf = tf.fromAxisAndAngle(self.axis[0], self.axis[1],
-                                     self.axis[2], rad2deg*value)
+                                     self.axis[2], rad2deg*self._value)
         elif self.type == 'prismatic':
             t = self.axis * value
             tf = tf.moveto(t[0], t[1], t[2])
@@ -194,8 +194,8 @@ class GLURDFItem(GLGraphicsItem):
 
     def set_joints(self, values: Union[list, np.ndarray]):
         """ 设置所有活动关节 """
-        for i, joint in enumerate(self.get_joints(movable=True)):
-            joint.set_value(values[i])
+        for joint, val in zip(self.get_joints(movable=True), values):
+            joint.set_value(val)
 
     def get_joints(self, movable=True) -> List[Joint]:
         """ 默认返回所有活动关节 """
@@ -221,6 +221,10 @@ class GLURDFItem(GLGraphicsItem):
         if isinstance(name, int):
             name = list(self._links.keys())[name]
         return self._links[name]
+
+    def get_link_tf(self, name: Union[int, str]) -> Matrix4x4:
+        """返回连体坐标系到世界坐标系的变换矩阵"""
+        return self.get_link(name).axis.transform(local=False)
 
     def add_link(self, link: GLLinkItem,
                  parent_link: Union[int, str],

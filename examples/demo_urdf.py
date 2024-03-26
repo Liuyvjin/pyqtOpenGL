@@ -7,17 +7,17 @@ class GLView(GLViewWidget):
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent=parent, **kwargs)
         self.resize(1200, 900)
-        self.camera.set_params((-0.01, 0.38, 3.94), 17.95, 0.03, -0.23)
+        self.camera.set_params((-0.01, 0.38, 3.94), -73, 0.0, -90)
         self.ax = GLAxisItem(fix_to_corner=True)
 
         # -- lights
-        self.light = PointLight(pos=[0, 15, 0],
+        self.light = PointLight(pos=[0, 0, 15],
                                ambient=(0.3, 0.3, 0.3),
                                diffuse=(0.7, 0.7, 0.7),
                                specular=(1, 1, 1),
                                visible=True,
                                directional=True)
-        self.light2 = PointLight(pos=[5, -5, 14],
+        self.light2 = PointLight(pos=[5, 14, -5],
                                ambient=(0.3, 0.3, 0.3),
                                diffuse=(0.7, 0.7, 0.7),
                                specular=(1, 1, 1),
@@ -27,13 +27,12 @@ class GLView(GLViewWidget):
         self.grid = GLGridItem(
             size=(5, 5), spacing=(0.25, 0.25), lineWidth=1,
             lights=[self.light]
-        )
+        ).rotate(90, 1, 0, 0)
 
         self.model = GLURDFItem(
             "./pyqtOpenGL/items/resources/objects/panda/panda_with_gelslim.urdf",
             lights=[self.light, self.light2]
         )
-        self.model.rotate(-90, 1, 0, 0)
         self.model.print_links()
         self.model.print_joints()
 

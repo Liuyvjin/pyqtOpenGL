@@ -178,9 +178,17 @@ class GLGraphicsItem(QtCore.QObject):
         self.__transform = Matrix4x4()
         self.update()
 
-    def transform(self):
+    def transform(self, local=True):
         """Return this item's transform object."""
-        return self.__transform
+        if local:
+            return self.__transform
+        else:
+            tf = Matrix4x4(self.__transform)
+            parent = self.parentItem()
+            while parent is not None:
+                tf = parent.transform() * tf
+                parent = parent.parentItem()
+            return tf
 
     def viewTransform(self):
         """Return the transform mapping this item's local coordinate system to the

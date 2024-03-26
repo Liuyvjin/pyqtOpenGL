@@ -1,6 +1,5 @@
-from math import acos, degrees
 import numpy as np
-import numpy as np
+from math import acos, degrees, atan2, asin, radians
 from typing import Any, Union, List
 from .functions import dispatchmethod
 from PyQt5.QtGui import QQuaternion, QMatrix4x4, QVector3D, QMatrix3x3, QVector4D
@@ -230,6 +229,39 @@ class Matrix4x4(QMatrix4x4):
         rot.rotate(q)
         return rot
 
+    @classmethod
+    def fromVector6d(cls, x, y, z, pitch, yaw, roll) -> "Matrix4x4":
+        """rotate by quaternion"""
+        return cls.fromEulerAngles(pitch, yaw, roll).moveto(x, y, z)
+
+    @classmethod
+    def fromZYXEulerAngles(cls, z, y, x) -> "Matrix4x4":
+        """rotate around z, then y, then x (degree)"""
+        q = (QQuaternion.fromEulerAngles(0, 0, z)
+            * QQuaternion.fromEulerAngles(0, y, 0)
+            * QQuaternion.fromEulerAngles(x, 0, 0))
+        mat = cls().rotate(q)
+        return mat
+
+    def toZYXEulerAngles(self):
+        """rotate around z, then y, then x (degree)"""
+        mat = self.matrix44
+        alpha = atan2(mat[1, 0], mat[0, 0])
+        beta = atan2(-mat[2, 0], np.sqrt(mat[2, 1]**2 + mat[2, 2]**2))
+        gamma = atan2(mat[2, 1], mat[2, 2])
+
+        angle = np.array([degrees(alpha), degrees(beta), degrees(gamma)])
+        # eq_angle = np.array([angle[0]-180, 180-angle[1], angle[2]-180])
+
+        # if eq_angle[1] > 180:
+        #     eq_angle[1] -= 360
+        # if eq_angle[2] < -180:
+        #     eq_angle[2] += 360
+
+        # if np.linalg.norm(eq_angle) < np.linalg.norm(angle):
+        #     return eq_angle
+        return angle
+
     def inverse(self):
         mat, ret = self.inverted()
         assert ret, "matrix is not invertible"
@@ -240,11 +272,18 @@ class Matrix4x4(QMatrix4x4):
         return Quaternion.fromMatrix4x4(self)
 
     def toEularAngles(self):
+        """degree"""
         return self.toQuaternion().toEulerAngles()
 
     def toTranslation(self):
         trans = self.column(3)
         return Vector3(trans.x(), trans.y(), trans.z())
+
+    def toVector6d(self):
+        """return [x, y, z, pitch, yaw, roll], degree"""
+        t = self.toTranslation()
+        rpy = self.toEularAngles()
+        return np.array([*t, *rpy])
 
     def __mul__(self, other):
         if isinstance(other, Matrix4x4):

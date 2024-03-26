@@ -185,6 +185,10 @@ class VBO():
     def delete(self):
         gl.glDeleteBuffers(1, [self._vbo])
 
+    def getSize(self, id):
+        """get size of buffer"""
+        return self.blocks.block_lens[id] // self.blocks.dtype[id].itemsize
+
     def getData(self, id):
         """get data from buffer"""
         self.bind()

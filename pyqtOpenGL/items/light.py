@@ -184,11 +184,12 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewPos)
     float distance = 0.0;
     if (light.directional)
         lightDir = normalize(light.position);
-    else
+    else{
         lightDir = normalize(light.position - fragPos);
         distance = length(light.position - fragPos);
         attenuation = 1.0 / (light.constant + light.linear * distance +
                      light.quadratic * (distance * distance));
+    }
 
     //vec3 halfwayDir = normalize(lightDir + viewDir);
     vec3 reflectDir = reflect(-lightDir, normal);

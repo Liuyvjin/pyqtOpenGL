@@ -49,7 +49,7 @@ class GLLinePlotItem(GLGraphicsItem):
             self._color = np.array(color, dtype=np.float32)
             self._color_update_flag = True
 
-        if self._color is not None and self._color.size == 3 and self._num > 1:
+        if self._color is not None and self._color.size == 3 and self._num >= 1:
             self._color = np.tile(self._color, (self._num, 1))
 
         if opacity is not None:
@@ -95,7 +95,7 @@ class GLLinePlotItem(GLGraphicsItem):
             gl.glDrawArrays(
                 gl.GL_LINE_STRIP,
                 0,
-                self._num
+                self.vbo.getSize(0)//3
             )
 
 
